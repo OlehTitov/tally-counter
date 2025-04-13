@@ -273,14 +273,21 @@ extension TallyCounter {
 private extension TallyCounter {
     private func findDirection(translation: CGSize) {
         withAnimation {
-            if translation.height <= 30 {
+            // Calculate absolute values for comparison
+            let absX = abs(translation.width)
+            let absY = abs(translation.height)
+            
+            // If vertical movement is significantly greater than horizontal, prioritize down
+            if absY > absX * 1.5 && absY > 20 {
+                self.draggingDirection = .down
+            }
+            // Detect horizontal movements when they are dominant
+            else if absX > 20 {
                 if translation.width > 0 {
                     self.draggingDirection = .right
-                } else if translation.width < 0 {
+                } else {
                     self.draggingDirection = .left
                 }
-            } else if self.draggingDirection == .none {
-                self.draggingDirection = .down
             }
         }
     }
