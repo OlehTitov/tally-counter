@@ -72,7 +72,7 @@ public struct TallyCounter: View {
                     )
                 }
                 
-                var newAmount = Int(labelOffsetXInPercents * 100)
+                var newAmount = Int(labelOffsetXInPercents * 10)
 
                 // Fix for minimum value enforcement
                 if newAmount < 0 {
