@@ -73,9 +73,13 @@ public struct TallyCounter: View {
                 }
                 
                 var newAmount = Int(labelOffsetXInPercents * 100)
-                
-                if newAmount < 0 && count + newAmount < config.minValue {
-                    newAmount = -(count % newAmount)
+
+                // Fix for minimum value enforcement
+                if newAmount < 0 {
+                    // Ensure we don't go below the minimum value
+                    if count + newAmount < config.minValue {
+                        newAmount = config.minValue - count
+                    }
                 } else if count + newAmount > config.maxValue {
                     newAmount = config.maxValue - count
                 }
@@ -296,12 +300,18 @@ private extension TallyCounter {
 //MARK: - Operations
 private extension TallyCounter {
     func decrease() {
-        if self.count != config.minValue {
-            let amountToSubtract = abs(self.amount == 0 ? 1 : self.amount)
+        let amountToSubtract = abs(self.amount == 0 ? 1 : self.amount)
+    
+        // Ensure we don't go below the minimum value
+        if self.count - amountToSubtract >= config.minValue {
             self.count -= amountToSubtract
             
             let extra = Float(amountToSubtract) / 200 > 0.5 ? 0.5 : Float(amountToSubtract) / 200
             playHapticTransient(intensity: initialIntensity + extra, sharpness: initialSharpness + extra)
+        } else {
+            // Set to minimum value if subtraction would go below
+            self.count = config.minValue
+            playHapticTransient(intensity: initialIntensity, sharpness: initialSharpness)
         }
     }
     func increase() {
