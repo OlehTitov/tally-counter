@@ -328,7 +328,7 @@ private extension TallyCounter {
         playHapticTransient(intensity: 1, sharpness: 1)
     }
     func reset() {
-        self.count = 0
+        self.count = config.minValue
         playHapticTransient(intensity: 1, sharpness: 1)
     }
 }
