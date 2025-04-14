@@ -177,7 +177,7 @@ private extension TallyCounter {
             .shadow(color: .black.opacity(0.3), radius: 3, x: 0, y: 5)
             .font(.system(size: labelFontSize, weight: .semibold, design: .rounded))
             .contentShape(Circle())
-            .onTapGesture(perform: self.setMax)
+            .onTapGesture(perform: self.increase)
             .if(config.showAmountLabel) {
                 $0.overlay(
                     VStack {
