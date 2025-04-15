@@ -50,43 +50,50 @@ public struct TallyCounter: View {
     public var body: some View {
         let labelDragGesture = DragGesture(minimumDistance: 0, coordinateSpace: .local)
             .onChanged { value in
-                findDirection(translation: value.translation)
+                // Check if the gesture started within the bounds of the label view
+                let labelBounds = CGRect(origin: .zero, size: CGSize(width: labelSize, height: labelSize))
+                let gestureStartedInBounds = labelBounds.contains(value.startLocation)
 
-                var newWidth = value.translation.width * 0.55
-                var newHeight = value.translation.height * 0.55
+                if gestureStartedInBounds {
                 
-                // Set limits
-                newWidth = newWidth > labelOffsetXLimit ? labelOffsetXLimit : newWidth
-                newWidth = newWidth < -labelOffsetXLimit ? -labelOffsetXLimit : newWidth
-                
-                newHeight = newHeight > labelOffsetYLimit ? labelOffsetYLimit : newHeight
-                
-                if value.translation.height < 0 {
-                    newHeight = 0
-                }
-                
-                withAnimation {
-                    self.labelOffset = .init(
-                        width: self.draggingDirection == .down ? 0 : newWidth,
-                        height: self.draggingDirection == .down ? newHeight : 0
-                    )
-                }
-                
-                var newAmount = Int(labelOffsetXInPercents * 10)
-
-                // Fix for minimum value enforcement
-                if newAmount < 0 {
-                    // Ensure we don't go below the minimum value
-                    if count + newAmount < config.minValue {
-                        newAmount = config.minValue - count
+                    findDirection(translation: value.translation)
+    
+                    var newWidth = value.translation.width * 0.55
+                    var newHeight = value.translation.height * 0.55
+                    
+                    // Set limits
+                    newWidth = newWidth > labelOffsetXLimit ? labelOffsetXLimit : newWidth
+                    newWidth = newWidth < -labelOffsetXLimit ? -labelOffsetXLimit : newWidth
+                    
+                    newHeight = newHeight > labelOffsetYLimit ? labelOffsetYLimit : newHeight
+                    
+                    if value.translation.height < 0 {
+                        newHeight = 0
                     }
-                } else if count + newAmount > config.maxValue {
-                    newAmount = config.maxValue - count
+                
+                    withAnimation {
+                        self.labelOffset = .init(
+                            width: self.draggingDirection == .down ? 0 : newWidth,
+                            height: self.draggingDirection == .down ? newHeight : 0
+                        )
+                    }
+                    
+                    var newAmount = Int(labelOffsetXInPercents * 10)
+    
+                    // Fix for minimum value enforcement
+                    if newAmount < 0 {
+                        // Ensure we don't go below the minimum value
+                        if count + newAmount < config.minValue {
+                            newAmount = config.minValue - count
+                        }
+                    } else if count + newAmount > config.maxValue {
+                        newAmount = config.maxValue - count
+                    }
+                
+                    self.amountProxy.wrappedValue = newAmount
+                    
+                    playHapticContinuous()
                 }
-                
-                self.amountProxy.wrappedValue = newAmount
-                
-                playHapticContinuous()
             }
             .onEnded { value in
                 if draggingDirection == .right {
