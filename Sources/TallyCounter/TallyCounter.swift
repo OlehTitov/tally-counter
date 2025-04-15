@@ -48,7 +48,7 @@ public struct TallyCounter: View {
     }
     
     public var body: some View {
-        let labelDragGesture = DragGesture()
+        let labelDragGesture = DragGesture(minimumDistance: 0, coordinateSpace: .local)
             .onChanged { value in
                 findDirection(translation: value.translation)
 
